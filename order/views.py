@@ -37,6 +37,8 @@ def buyProduct(request, product_id):
             "url": response['url'] 
         }), status=200)
     except Exception as e:
+        # import traceback
+        # traceback.print_exc()
         return HttpResponse(json.dumps({
             "error": str(e),
             "message": "The transaction could not be created!"
