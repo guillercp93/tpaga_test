@@ -27,7 +27,8 @@ def buyProduct(request, product_id):
         orderProduct.total = product.price * int(amount)
         orderProduct.save()
 
-        response = createPayRequest(order)
+        callback_url = "https://{0}/finish_buy/{1}/".format(request.get_host(), order.id)
+        response = createPayRequest(order, callback_url)
         order.token = response['token']
         order.status = response['status']
         order.save()

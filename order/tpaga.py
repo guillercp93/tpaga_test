@@ -12,7 +12,7 @@ def getAuthorization():
     authorization = ("{0}:{1}".format(username, password)).encode()
     return b64encode(authorization).decode()
 
-def createPayRequest(order):
+def createPayRequest(order, purchase_details_url):
     orderProducts = OrderProduct.objects.filter(order=order)
     purchase_items = []
     for product in orderProducts:
@@ -20,11 +20,11 @@ def createPayRequest(order):
             "name": product.product.name,
             "value": product.total
         })
-    expire_date = datetime.now() + timedelta(minutes=5)
+    expire_date = datetime.now() + timedelta(minutes=30)
 
     data = {
         "cost": order.total,
-        "purchase_details_url": "https://example.com/compra/348820",
+        "purchase_details_url": purchase_details_url,
         "idempotency_token":str(uuid4()),
         "order_id":order.id,
         "terminal_id":"minitrade",
@@ -33,13 +33,13 @@ def createPayRequest(order):
         "user_ip_address":order.client,
         "expires_at": expire_date.astimezone().isoformat()
     }
-
+    print(data)
     response = requests.post('https://stag.wallet.tpaga.co/merchants/api/v1/payment_requests/create',
         data= json.dumps(data), headers={
             "Content-Type" : "application/json",
             "Cache-Control": "no-cache",
             "authorization" : "Basic "+ getAuthorization()})
-
+    print(response.json())
     if response.status_code == 201:
         data = response.json()
         return {
@@ -72,3 +72,14 @@ def confirmStateTransaction(token):
             "url": "",
             "status": "failed"
         }
+
+def revertedPaid(token):
+    response = requests.post('https://stag.wallet.tpaga.co/merchants/api/v1/payment_requests/refund',
+        data=json.dumps({"payment_request_token": token}), headers={
+            "Content-Type" : "application/json",
+            "Cache-Control": "no-cache",
+            "authorization" : "Basic "+ getAuthorization()})
+
+    data = response.json()
+    print(data)
+    return data.get('status') == 'reverted'
