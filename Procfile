@@ -1,0 +1,1 @@
+web: gunicorn mintrade.wsgi --log-file -

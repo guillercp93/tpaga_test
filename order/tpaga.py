@@ -1,15 +1,13 @@
-from uuid import uuid4
-from order.models import Order, OrderProduct
-from datetime import datetime, timedelta
 from base64 import b64encode
+from datetime import datetime, timedelta
+from django.conf import settings
+from order.models import Order, OrderProduct
+from uuid import uuid4
 import requests
 import json
 
-username="miniapp-gato1"
-password="miniappma-123"
-
 def getAuthorization():
-    authorization = ("{0}:{1}".format(username, password)).encode()
+    authorization = ("{0}:{1}".format(settings.TPAGA_USERNAME, settings.TPAGA_PASSWORD)).encode()
     return b64encode(authorization).decode()
 
 def createPayRequest(order, purchase_details_url):
@@ -33,13 +31,13 @@ def createPayRequest(order, purchase_details_url):
         "user_ip_address":order.client,
         "expires_at": expire_date.astimezone().isoformat()
     }
-    print(data)
+    # print(data)
     response = requests.post('https://stag.wallet.tpaga.co/merchants/api/v1/payment_requests/create',
         data= json.dumps(data), headers={
             "Content-Type" : "application/json",
             "Cache-Control": "no-cache",
             "authorization" : "Basic "+ getAuthorization()})
-    print(response.json())
+    # print(response.json())
     if response.status_code == 201:
         data = response.json()
         return {
@@ -81,5 +79,5 @@ def revertedPaid(token):
             "authorization" : "Basic "+ getAuthorization()})
 
     data = response.json()
-    print(data)
+    # print(data)
     return data.get('status') == 'reverted'
