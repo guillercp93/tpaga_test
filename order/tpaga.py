@@ -12,7 +12,7 @@ def getAuthorization():
     authorization = ("{0}:{1}".format(username, password)).encode()
     return b64encode(authorization).decode()
 
-def createRequest(order):
+def createPayRequest(order):
     orderProducts = OrderProduct.objects.filter(order=order)
     purchase_items = []
     for product in orderProducts:
@@ -37,6 +37,7 @@ def createRequest(order):
     response = requests.post('https://stag.wallet.tpaga.co/merchants/api/v1/payment_requests/create',
         data= json.dumps(data), headers={
             "Content-Type" : "application/json",
+            "Cache-Control": "no-cache",
             "authorization" : "Basic "+ getAuthorization()})
 
     if response.status_code == 201:
@@ -50,5 +51,24 @@ def createRequest(order):
         return {
             "token": "",
             "url": "",
-            "status": "fail"
+            "status": "failed"
+        }
+
+def confirmStateTransaction(token):
+    response = requests.get('https://stag.wallet.tpaga.co/merchants/api/v1/payment_requests/'+token+'/info',
+        headers={
+            "Content-Type" : "application/json",
+            "Cache-Control": "no-cache",
+            "authorization" : "Basic "+ getAuthorization()})
+
+    if response.status_code == 201:
+        data = response.json()
+        return {
+            "status": data["status"]
+        }
+    else:
+        return {
+            "token": "",
+            "url": "",
+            "status": "failed"
         }

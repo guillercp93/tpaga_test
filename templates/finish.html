@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row gtr-200">
+	<div class="col-8 col-12-medium imp-medium">
+		<div id="content">
+
+			<!-- Content -->
+			<article>
+				{% if status == "success" %}
+				<h2>Congratulations!</h2>
+				{% else %}
+				<h2>Oppss!!</h2>
+				{% endif %}
+
+				<p>{{ message }}</p>
+
+			</article>
+			<a href="/" class="button icon fa-arrow-circle-left">Back</a>
+		</div>
+	</div>
+</div>
+{% endblock %}

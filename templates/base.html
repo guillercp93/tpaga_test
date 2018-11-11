@@ -42,32 +42,8 @@
 			<!-- Main -->
 				<div id="features-wrapper">
 					<div class="container">
-						{% csrf_token %}
-						<div class="row">
-							{% for product in products %}
-							<div class="col-4 col-12-medium">
-
-								<!-- Box -->
-									<section class="box feature">
-										<a href="#" class="image featured">
-											<img src="/static/images/{{product.name}}.jpg" alt="" />
-										</a>
-										<div class="inner">
-											<header>
-												<h2>{{product.name}}</h2>
-											</header>
-											<p>{{product.details}}</p>
-											<p><b>TradeMark:</b> {{product.trademark}}</p>
-											<p><b>Price:</b> US${{product.price|intcomma}}</p>
-											<p><b>Amount: </b><input type="number" id="amount_{{product.id}}" /></p>
-											<br />
-											<button type="button" onClick="buyProduct({{product.id}});" class="button icon fa-shopping-cart">Buy</a>
-										</div>
-									</section>
-
-							</div>
-							{% endfor %}
-						</div>
+						{% block content %}
+						{% endblock %}
 					</div>
 				</div>
 
